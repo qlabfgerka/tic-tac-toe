@@ -24,5 +24,7 @@ public class User {
     @Column(unique = true)
     private String email;
     private String password;
+
+    @Column(columnDefinition = "integer default 0")
     private Long wins;
 }

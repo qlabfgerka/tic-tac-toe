@@ -1,0 +1,33 @@
+.flexbox {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.break {
+  height: 0;
+  flex-basis: 100%;
+  margin-bottom: 10px;
+}
+
+.form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.wide {
+  width: 100%;
+}
+
+.auto {
+  width: auto;
+}
+
+.center-text {
+  text-align: center;
+}
+
+.margin {
+  margin: 1rem;
+}

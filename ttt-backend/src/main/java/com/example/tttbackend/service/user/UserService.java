@@ -42,6 +42,7 @@ public class UserService implements IUserService, UserDetailsService {
     public User createUser(User user) {
         log.info("Creating a new user {}", user.getUsername());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setNickname(user.getUsername());
         return userRepository.save(user);
     }
 
