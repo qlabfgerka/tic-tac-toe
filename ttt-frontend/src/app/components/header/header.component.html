@@ -1,5 +1,5 @@
 <mat-toolbar color="primary">
-  <span>Tic Tac Toe</span>
+  <span class="pointer" (click)="navigateHome()">Tic Tac Toe</span>
   <span class="spacer"></span>
   <button mat-icon-button *ngIf="isLoggedIn" (click)="logout()">
     <mat-icon>logout</mat-icon>

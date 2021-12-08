@@ -1,0 +1,38 @@
+<div class="flexbox margin" *ngIf="!this.isLoading">
+  <div *ngFor="let row of [].constructor(3); let i = index">
+    <div *ngFor="let column of [].constructor(3); let j = index">
+      <div
+        class="board margin"
+        (click)="boardClick(i, j)"
+        [ngClass]="{
+          green: game.board[i][j] === getUsername,
+          red: game.board[i][j] !== '' && game.board[i][j] !== getUsername
+        }"
+      ></div>
+    </div>
+  </div>
+  <div>
+    <table>
+      <tr>
+        <th>WINNER</th>
+        <th>{{ getUsername.toUpperCase() }}'S WINS:</th>
+        <th>AI'S WINS:</th>
+      </tr>
+      <tr>
+        <td>{{ winner }}</td>
+        <td>{{ p1Wins }}</td>
+        <td>{{ p2Wins }}</td>
+      </tr>
+    </table>
+    <div class="flexbox margin">
+      <button
+        mat-raised-button
+        color="accent"
+        (click)="newGame()"
+        [disabled]="!isFinished"
+      >
+        NEW GAME
+      </button>
+    </div>
+  </div>
+</div>
