@@ -13,11 +13,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class JWTUtils {
-    public static final String secret = "...";
+    public static final String secret = "ASubWIGWAGWq7w8zrGFS/(QG7qwr";
     private static final Algorithm algorithm = Algorithm.HMAC256(secret.getBytes(StandardCharsets.UTF_8));
 
     public static final int accessTokenExpiration = 10 * 60 * 1000;
@@ -56,9 +55,9 @@ public class JWTUtils {
         return map;
     }
 
-    public static void handleJWTError(HttpServletResponse response, String message) throws IOException {
+    public static void handleJWTError(HttpServletResponse response, String message, int status) throws IOException {
         response.setHeader("error", message);
-        response.setStatus(FORBIDDEN.value());
+        response.setStatus(status);
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), JWTUtils.setMap("errorMessage", message));
     }

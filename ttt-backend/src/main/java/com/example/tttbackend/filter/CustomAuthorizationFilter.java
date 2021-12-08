@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @Slf4j
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
@@ -21,7 +22,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        if (request.getServletPath().equals("/users/login"))
+        if (request.getServletPath().equals("/users/login") || request.getServletPath().equals("/users/refreshToken"))
             filterChain.doFilter(request, response);
         else {
             String authorizationHeader = request.getHeader(AUTHORIZATION);
@@ -33,7 +34,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     filterChain.doFilter(request, response);
                 } catch (Exception e) {
-                    JWTUtils.handleJWTError(response, e.getMessage());
+                    JWTUtils.handleJWTError(response, e.getMessage(), UNAUTHORIZED.value());
                 }
             } else {
                 filterChain.doFilter(request, response);

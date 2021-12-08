@@ -8,7 +8,7 @@ import {
   HttpErrorResponse,
 } from '@angular/common/http';
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
-import { catchError, filter, take, switchMap } from 'rxjs/operators';
+import { catchError, filter, take, switchMap, finalize } from 'rxjs/operators';
 import { TokenDTO } from 'src/app/models/token/token.model';
 import { UserService } from 'src/app/services/user/user.service';
 
@@ -57,12 +57,17 @@ export class JWTInterceptor implements HttpInterceptor {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
 
-      next.handle(this.addToken(request, this.userService.getRefreshToken()));
       return this.userService.refreshToken().pipe(
         switchMap((token: TokenDTO) => {
-          this.isRefreshing = false;
           this.refreshTokenSubject.next(token.accessToken);
           return next.handle(this.addToken(request, token.accessToken));
+        }),
+        catchError((error) => {
+          this.userService.logout();
+          return throwError(error);
+        }),
+        finalize(() => {
+          this.isRefreshing = false;
         })
       );
     } else {

@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -40,17 +40,18 @@ public class UserController {
     }
 
     @PostMapping("refreshToken")
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String authorizationHeader = request.getHeader(AUTHORIZATION);
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+    public void refreshToken(@RequestBody String refreshToken,
+                             HttpServletRequest request,
+                             HttpServletResponse response) throws IOException {
+        if (refreshToken != null) {
             try {
-                String username = JWTUtils.getSubject(authorizationHeader.substring("Bearer ".length()));
+                String username = JWTUtils.getSubject(refreshToken);
                 String URL = request.getRequestURL().toString();
 
                 response.setContentType(APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(), JWTUtils.getTokens(username, URL));
             } catch (Exception e) {
-                JWTUtils.handleJWTError(response, e.getMessage());
+                JWTUtils.handleJWTError(response, e.getMessage(), FORBIDDEN.value());
             }
         } else {
             throw new RuntimeException("Refresh token is missing");

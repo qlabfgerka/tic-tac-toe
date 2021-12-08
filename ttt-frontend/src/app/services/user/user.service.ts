@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { TokenDTO } from 'src/app/models/token/token.model';
@@ -11,7 +12,10 @@ import { UserDTO } from 'src/app/models/user/user.model';
 export class UserService {
   private readonly hostname: string = 'http://localhost:3000';
 
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(
+    private readonly httpClient: HttpClient,
+    private readonly router: Router
+  ) {}
 
   public login(username: string, password: string): Observable<TokenDTO> {
     let body = new URLSearchParams();
@@ -38,12 +42,20 @@ export class UserService {
 
   public refreshToken(): Observable<TokenDTO> {
     return this.httpClient
-      .post<TokenDTO>(`${this.hostname}/users/refreshToken`, {})
+      .post<TokenDTO>(
+        `${this.hostname}/users/refreshToken`,
+        this.getRefreshToken()
+      )
       .pipe(
         tap((tokens: TokenDTO) => {
           this.saveTokens(tokens);
         })
       );
+  }
+
+  public logout(): void {
+    this.deleteTokens();
+    this.router.navigate(['login']);
   }
 
   public saveTokens(tokens: TokenDTO): boolean {
