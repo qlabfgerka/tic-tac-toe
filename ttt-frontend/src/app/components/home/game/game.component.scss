@@ -1,0 +1,29 @@
+.board {
+  width: 100px;
+  height: 100px;
+  background-color: white;
+}
+
+.black {
+  color: black;
+}
+
+.green {
+  background-color: #00e676;
+}
+
+.red {
+  background-color: #ff4081;
+}
+
+table {
+  font-family: arial, sans-serif;
+  width: 500px;
+}
+
+td,
+th {
+  text-align: center;
+  padding: 1rem;
+  margin: 2rem;
+}
