@@ -5,7 +5,7 @@ import { HomeComponent } from './home.component';
 const routes: Routes = [
   { path: '', component: HomeComponent },
   {
-    path: `game`,
+    path: `game/:id`,
     loadChildren: () => import('./game/game.module').then((m) => m.GameModule),
   },
   {

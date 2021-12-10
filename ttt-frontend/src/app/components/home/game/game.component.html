@@ -15,8 +15,26 @@
     <table>
       <tr>
         <th>WINNER</th>
-        <th>{{ getUsername.toUpperCase() }}'S WINS:</th>
-        <th>AI'S WINS:</th>
+        <th
+          [ngClass]="{
+            green:
+              this.game.turn <= this.game.players.length - 1 &&
+              getUsername.toUpperCase() ===
+                this.game.players[this.game.turn].username.toUpperCase()
+          }"
+        >
+          {{ getUsername.toUpperCase() }}'S WINS:
+        </th>
+        <th
+          [ngClass]="{
+            green:
+              this.game.turn <= this.game.players.length - 1 &&
+              getOpponentUsername ===
+                this.game.players[this.game.turn].username.toUpperCase()
+          }"
+        >
+          {{ this.singleplayer ? "AI'S WINS:" : getOpponentUsernameTable }}
+        </th>
       </tr>
       <tr>
         <td>{{ winner }}</td>

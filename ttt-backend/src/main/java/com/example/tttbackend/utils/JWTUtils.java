@@ -19,7 +19,7 @@ public class JWTUtils {
     public static final String secret = "ASubWIGWAGWq7w8zrGFS/(QG7qwr";
     private static final Algorithm algorithm = Algorithm.HMAC256(secret.getBytes(StandardCharsets.UTF_8));
 
-    public static final int accessTokenExpiration = 1 * 60 * 1000;
+    public static final int accessTokenExpiration = 10 * 60 * 1000;
     public static final int refreshTokenExpiration = 60 * 1000 * 60 * 24 * 7;
 
     public static String signToken(String username, String URL, int exp) {

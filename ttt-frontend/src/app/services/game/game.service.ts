@@ -11,6 +11,10 @@ export class GameService {
 
   constructor(private readonly httpClient: HttpClient) {}
 
+  public getGame(id: string): Observable<GameDTO> {
+    return this.httpClient.get<GameDTO>(`${this.hostname}/game/${id}`);
+  }
+
   public playRound(game: GameDTO, i: number, j: number): Observable<GameDTO> {
     return this.httpClient.post<GameDTO>(`${this.hostname}/game/round`, {
       game,
@@ -19,7 +23,21 @@ export class GameService {
     });
   }
 
-  public createGame(): Observable<GameDTO> {
-    return this.httpClient.post<GameDTO>(`${this.hostname}/game`, {});
+  public createGame(multiplayer: boolean): Observable<GameDTO> {
+    return this.httpClient.post<GameDTO>(`${this.hostname}/game`, {
+      multiplayer,
+    });
+  }
+
+  public leaveGame(id: number): Observable<void> {
+    return this.httpClient.delete<void>(`${this.hostname}/game/${id}`);
+  }
+
+  public clearGame(id: number): Observable<GameDTO> {
+    return this.httpClient.delete<GameDTO>(`${this.hostname}/game/clear/${id}`);
+  }
+
+  public joinGame(): Observable<GameDTO> {
+    return this.httpClient.get<GameDTO>(`${this.hostname}/game/find`);
   }
 }

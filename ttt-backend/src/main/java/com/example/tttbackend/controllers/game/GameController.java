@@ -8,13 +8,11 @@ import com.example.tttbackend.utils.JWTUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,10 +30,15 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 public class GameController {
     private final GameService gameService;
 
+    @GetMapping("{id}")
+    public ResponseEntity<Game> getGame(@PathVariable Long id, HttpServletRequest request) {
+        return ResponseEntity.ok().body(this.gameService.getGame(id));
+    }
+
     @PostMapping
-    public ResponseEntity<Game> createGame(HttpServletRequest request) {
+    public ResponseEntity<Game> createGame(HttpServletRequest request, @RequestBody GameWrapper wrapper) {
         Game game = gameService
-                .createGame(JWTUtils.getSubject(request.getHeader(AUTHORIZATION).substring("Bearer ".length())), false);
+                .createGame(JWTUtils.getSubject(request.getHeader(AUTHORIZATION).substring("Bearer ".length())), wrapper.isMultiplayer());
         return ResponseEntity
                 .created(
                         URI.create(ServletUriComponentsBuilder
@@ -47,37 +50,55 @@ public class GameController {
     @PostMapping("round")
     public ResponseEntity<Game> playRound(@RequestBody GameWrapper wrapper, HttpServletRequest request) {
         return ResponseEntity.ok().body(
-                this.gameService.playRoundSP(
+                this.gameService.playRound(
                         wrapper.getGame(),
                         wrapper.getI(),
                         wrapper.getJ(),
-                        JWTUtils.getSubject(request.getHeader(AUTHORIZATION).substring("Bearer ".length()))));
+                        JWTUtils.getSubject(request.getHeader(AUTHORIZATION).substring("Bearer ".length())),
+                        false)
+        );
     }
 
-    @PostMapping("multiplayer")
-    public ResponseEntity<Game> createGameMP(HttpServletRequest request) {
-        Game game = gameService
-                .createGame(JWTUtils.getSubject(request.getHeader(AUTHORIZATION).substring("Bearer ".length())), true);
-        return ResponseEntity
-                .created(
-                        URI.create(ServletUriComponentsBuilder
-                                .fromCurrentContextPath().path("/game")
-                                .toUriString()))
-                .body(game);
+    @GetMapping("find")
+    public ResponseEntity<Game> findGame(HttpServletRequest request) {
+        return ResponseEntity.ok().body(this.gameService
+                .findGame(JWTUtils.getSubject(request.getHeader(AUTHORIZATION).substring("Bearer ".length()))));
     }
-    /*@MessageMapping("/hello")
-    @SendTo("/topic/test")
-    public ResponseEntity<Game> createGameMP(Authentication authentication) {
+
+    @DeleteMapping("{id}")
+    public void leaveGame(@PathVariable Long id, HttpServletRequest request) {
+        this.gameService.leaveGame(id, JWTUtils.getSubject(request.getHeader(AUTHORIZATION).substring("Bearer ".length())));
+    }
+
+    @DeleteMapping("clear/{id}")
+    public ResponseEntity<Game> clearGame(@PathVariable Long id) {
+        return ResponseEntity.ok().body(this.gameService.clearGame(id, false));
+    }
+
+    @MessageMapping("/round/{id}")
+    @SendTo("/played/{id}")
+    public ResponseEntity<Game> playRoundMP(@DestinationVariable Long id, GameWrapper wrapper, Authentication authentication) {
         if (authentication == null) return new ResponseEntity<>(UNAUTHORIZED);
-        log.info("USER {}", authentication.getPrincipal());
         String username = authentication.getPrincipal().toString();
         if (username == null) return new ResponseEntity<>(UNAUTHORIZED);
+
         return ResponseEntity
-                .created(URI.create("localhost:3000/game/hello"))
-                .body(this.gameService.createGame(username, true));
-    }*/
+                .ok()
+                .body(this.gameService.playRound(
+                        wrapper.getGame(),
+                        wrapper.getI(),
+                        wrapper.getJ(),
+                        username,
+                        true));
+    }
 
-    public void joinGame(Authentication authentication) {
-
+    @MessageMapping("/clear/{id}")
+    @SendTo("/played/{id}")
+    public ResponseEntity<Game> clearBoardMP(@DestinationVariable Long id) {
+        return ResponseEntity
+                .ok()
+                .body(this.gameService.clearGame(
+                        id,
+                        true));
     }
 }

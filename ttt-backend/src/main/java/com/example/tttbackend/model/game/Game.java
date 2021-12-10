@@ -1,8 +1,12 @@
 package com.example.tttbackend.model.game;
 
 import com.example.tttbackend.model.user.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Proxy;
 
 import javax.persistence.*;
 import java.util.List;
@@ -11,21 +15,22 @@ import java.util.List;
 @Table(name = "game")
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Slf4j
 public class Game {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToMany(targetEntity = User.class)
+    @ManyToMany(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "id")
     private List<User> players;
 
     private String[][] board;
 
-    public Game(List<User> players, String[][] board) {
-        this.players = players;
-        this.board = board;
-    }
+    @Column(columnDefinition = "integer default 0")
+    private int turn;
 
     public void setRound(int i, int j, String username) {
         board[i][j] = username;
@@ -73,5 +78,9 @@ public class Game {
             }
         }
         return true;
+    }
+
+    public Boolean removePlayer(User player) {
+        return players.remove(player);
     }
 }

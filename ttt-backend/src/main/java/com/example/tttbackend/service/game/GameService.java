@@ -12,6 +12,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor    // userRepository inside constructor
@@ -22,28 +23,38 @@ public class GameService implements IGameService {
     private final UserRepository userRepository;
 
     @Override
-    public Game createGame(String username, boolean type) {
-        List<User> users = new ArrayList<>();
-        User user = userRepository.findByUsername(username);
-        users.add(user);
-        if(!type) {
-            User AI = new User();
-            AI.setUsername("bot");
-            users.add(AI);
-        }
-        Game game = new Game(users, new String[3][3]);
-        for (String[] row : game.getBoard()) {
-            Arrays.fill(row, "");
-        }
-        if(type) return gameRepository.save(game);
-        return game;
+    public Game getGame(Long id) {
+        return gameRepository.getById(id);
     }
 
     @Override
-    public Game playRoundSP(Game game, int i, int j, String username) {
+    public Game createGame(String username, boolean type) {
+        Game game = new Game();
+        List<User> users = new ArrayList<>();
+        User user = userRepository.findByUsername(username);
+        users.add(user);
+        if (!type) {
+            User AI = userRepository.findByUsername("bot");
+            users.add(AI);
+        }
+        game.setPlayers(users);
+        game.setBoard(new String[3][3]);
+        for (String[] row : game.getBoard()) {
+            Arrays.fill(row, "");
+        }
+
+        if (type) game.setTurn((int) Math.round(Math.random()));
+        return gameRepository.save(game);
+    }
+
+    @Override
+    public Game playRound(Game g, int i, int j, String username, boolean type) {
+        Game game = gameRepository.getById(g.getId());
         if (game.getBoard()[i][j].isEmpty()) {
             String winner;
             game.setRound(i, j, username);
+
+            if (type) game.setTurn(game.getTurn() == 0 ? 1 : 0);
 
             winner = game.getWinner();
 
@@ -57,17 +68,52 @@ public class GameService implements IGameService {
 
             if (game.isBoardFull()) return game;
 
-            while (true) {
-                i = (int) ((Math.random() * (3)));
-                j = (int) ((Math.random() * (3)));
+            if (!type) {
+                while (true) {
+                    i = (int) ((Math.random() * (3)));
+                    j = (int) ((Math.random() * (3)));
 
-                if (game.getBoard()[i][j].isEmpty()) {
-                    game.setRound(i, j, "bot");
-                    break;
+                    if (game.getBoard()[i][j].isEmpty()) {
+                        game.setRound(i, j, "bot");
+                        break;
+                    }
                 }
             }
         }
 
         return game;
+    }
+
+    @Override
+    public Game findGame(String username) {
+        User user = userRepository.findByUsername(username);
+        List<Game> game = gameRepository
+                .findAll()
+                .stream()
+                .filter(g -> g.getPlayers().size() == 1)
+                .collect(Collectors.toList());
+        if (game.get(game.size() - 1).getPlayers().get(0) == user) return game.get(game.size() - 1);
+        game.get(game.size() - 1).addPlayer(user);
+        return gameRepository.save(game.get(game.size() - 1));
+    }
+
+    @Override
+    public Game clearGame(Long id, boolean type) {
+        Game game = gameRepository.getById(id);
+        game.setBoard(new String[3][3]);
+        for (String[] row : game.getBoard()) {
+            Arrays.fill(row, "");
+        }
+        if (type) game.setTurn((int) Math.round(Math.random()));
+
+        return game;
+    }
+
+    @Override
+    public void leaveGame(Long id, String username) {
+        Game game = gameRepository.getById(id);
+        if(!game.removePlayer(userRepository.findByUsername(username))) return;
+        if(game.getPlayers().size() > 0) return;
+        gameRepository.delete(gameRepository.getById(id));
     }
 }
