@@ -10,4 +10,5 @@ public class GameWrapper {
     private int i;
     private int j;
     private int player;
+    private boolean multiplayer;
 }

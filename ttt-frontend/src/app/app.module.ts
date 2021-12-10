@@ -7,6 +7,12 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { HeaderModule } from './components/header/header.module';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { JWTInterceptor } from './interceptors/jwt/jwt.interceptor';
+import {
+  InjectableRxStompConfig,
+  RxStompService,
+  rxStompServiceFactory,
+} from '@stomp/ng2-stompjs';
+import { myRxStompConfig } from './configs/socket/stomp.config';
 
 @NgModule({
   declarations: [AppComponent],
@@ -19,6 +25,15 @@ import { JWTInterceptor } from './interceptors/jwt/jwt.interceptor';
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JWTInterceptor, multi: true },
+    {
+      provide: InjectableRxStompConfig,
+      useValue: myRxStompConfig,
+    },
+    {
+      provide: RxStompService,
+      useFactory: rxStompServiceFactory,
+      deps: [InjectableRxStompConfig],
+    },
   ],
   bootstrap: [AppComponent],
 })
