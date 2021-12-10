@@ -4,16 +4,35 @@ import com.example.tttbackend.model.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import javax.persistence.*;
 import java.util.List;
 
+@Entity
+@Table(name = "game")
 @Data
 @AllArgsConstructor
 public class Game {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @ManyToMany(targetEntity = User.class)
+    @JoinColumn(name = "id")
     private List<User> players;
+
     private String[][] board;
+
+    public Game(List<User> players, String[][] board) {
+        this.players = players;
+        this.board = board;
+    }
 
     public void setRound(int i, int j, String username) {
         board[i][j] = username;
+    }
+
+    public void addPlayer(User user) {
+        players.add(user);
     }
 
     public String getWinner() {

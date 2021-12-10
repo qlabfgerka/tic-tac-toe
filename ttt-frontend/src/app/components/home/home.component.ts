@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { GameDTO } from 'src/app/models/game/game.model';
-import { SingleplayerService } from 'src/app/services/game/singleplayer.service';
+import { GameService } from 'src/app/services/game/game.service';
 
 @Component({
   selector: 'app-home',
@@ -12,13 +12,13 @@ import { SingleplayerService } from 'src/app/services/game/singleplayer.service'
 export class HomeComponent implements OnInit {
   constructor(
     private readonly router: Router,
-    private readonly spService: SingleplayerService
+    private readonly gameService: GameService
   ) {}
 
   ngOnInit(): void {}
 
   public singlePlayer(): void {
-    this.spService
+    this.gameService
       .createGame()
       .pipe(take(1))
       .subscribe((game: GameDTO) => {
@@ -31,5 +31,7 @@ export class HomeComponent implements OnInit {
       });
   }
 
-  public multiPlayer(): void {}
+  public multiPlayer(): void {
+    this.router.navigate(['multiplayer']);
+  }
 }

@@ -1,4 +1,4 @@
-package com.example.tttbackend.security;
+package com.example.tttbackend.configuration;
 
 import com.example.tttbackend.filter.CustomAuthenticationFilter;
 import com.example.tttbackend.filter.CustomAuthorizationFilter;
@@ -37,6 +37,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.cors();
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.authorizeRequests().antMatchers("/websockets").permitAll();
         http.authorizeRequests().antMatchers("/users/login/**").permitAll();
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/users").permitAll();
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/users/refreshToken").permitAll();

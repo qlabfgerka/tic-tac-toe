@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { GameDTO } from 'src/app/models/game/game.model';
-import { SingleplayerService } from 'src/app/services/game/singleplayer.service';
+import { GameService } from 'src/app/services/game/game.service';
 import { UserService } from 'src/app/services/user/user.service';
 
 @Component({
@@ -20,7 +20,7 @@ export class GameComponent implements OnInit {
   public p2Wins: number = 0;
 
   constructor(
-    private readonly gameService: SingleplayerService,
+    private readonly gameService: GameService,
     private readonly userService: UserService,
     private readonly router: Router
   ) {

@@ -6,7 +6,7 @@ import { GameDTO } from 'src/app/models/game/game.model';
 @Injectable({
   providedIn: 'root',
 })
-export class SingleplayerService {
+export class GameService {
   private readonly hostname: string = 'http://localhost:3000';
 
   constructor(private readonly httpClient: HttpClient) {}

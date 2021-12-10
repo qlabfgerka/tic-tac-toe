@@ -2,6 +2,7 @@ package com.example.tttbackend.service.game;
 
 import com.example.tttbackend.model.game.Game;
 import com.example.tttbackend.model.user.User;
+import com.example.tttbackend.repository.game.GameRepository;
 import com.example.tttbackend.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,20 +18,24 @@ import java.util.List;
 @Transactional
 @Slf4j
 public class GameService implements IGameService {
+    private final GameRepository gameRepository;
     private final UserRepository userRepository;
 
     @Override
-    public Game createGameSP(String username) {
+    public Game createGame(String username, boolean type) {
         List<User> users = new ArrayList<>();
-        User AI = new User();
-        AI.setUsername("bot");
         User user = userRepository.findByUsername(username);
         users.add(user);
-        users.add(AI);
+        if(!type) {
+            User AI = new User();
+            AI.setUsername("bot");
+            users.add(AI);
+        }
         Game game = new Game(users, new String[3][3]);
         for (String[] row : game.getBoard()) {
             Arrays.fill(row, "");
         }
+        if(type) return gameRepository.save(game);
         return game;
     }
 
