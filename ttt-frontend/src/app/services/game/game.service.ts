@@ -11,6 +11,10 @@ export class GameService {
 
   constructor(private readonly httpClient: HttpClient) {}
 
+  public getGames(): Observable<Array<GameDTO>> {
+    return this.httpClient.get<Array<GameDTO>>(`${this.hostname}/game`);
+  }
+
   public getGame(id: string): Observable<GameDTO> {
     return this.httpClient.get<GameDTO>(`${this.hostname}/game/${id}`);
   }
@@ -37,7 +41,11 @@ export class GameService {
     return this.httpClient.delete<GameDTO>(`${this.hostname}/game/clear/${id}`);
   }
 
-  public joinGame(): Observable<GameDTO> {
+  public findGame(): Observable<GameDTO> {
     return this.httpClient.get<GameDTO>(`${this.hostname}/game/find`);
+  }
+
+  public joinGame(id: number): Observable<GameDTO> {
+    return this.httpClient.get<GameDTO>(`${this.hostname}/game/join/${id}`);
   }
 }

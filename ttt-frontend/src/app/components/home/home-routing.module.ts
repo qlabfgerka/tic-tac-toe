@@ -8,13 +8,6 @@ const routes: Routes = [
     path: `game/:id`,
     loadChildren: () => import('./game/game.module').then((m) => m.GameModule),
   },
-  {
-    path: `multiplayer`,
-    loadChildren: () =>
-      import('./multiplayer/multiplayer.module').then(
-        (m) => m.MultiplayerModule
-      ),
-  },
 ];
 
 @NgModule({

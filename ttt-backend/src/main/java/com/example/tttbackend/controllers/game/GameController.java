@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.net.URI;
 import java.security.Principal;
+import java.util.List;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
@@ -29,6 +30,11 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 @Slf4j
 public class GameController {
     private final GameService gameService;
+
+    @GetMapping
+    public ResponseEntity<List<Game>> getGames() {
+        return ResponseEntity.ok().body(this.gameService.getGames());
+    }
 
     @GetMapping("{id}")
     public ResponseEntity<Game> getGame(@PathVariable Long id, HttpServletRequest request) {
@@ -63,6 +69,13 @@ public class GameController {
     public ResponseEntity<Game> findGame(HttpServletRequest request) {
         return ResponseEntity.ok().body(this.gameService
                 .findGame(JWTUtils.getSubject(request.getHeader(AUTHORIZATION).substring("Bearer ".length()))));
+    }
+
+    @GetMapping("join/{id}")
+    public ResponseEntity<Game> joinGame(@PathVariable Long id, HttpServletRequest request) {
+        return ResponseEntity.ok().body(this.gameService.joinGame(
+                id,
+                JWTUtils.getSubject(request.getHeader(AUTHORIZATION).substring("Bearer ".length()))));
     }
 
     @DeleteMapping("{id}")

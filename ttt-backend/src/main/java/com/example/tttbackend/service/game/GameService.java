@@ -23,6 +23,11 @@ public class GameService implements IGameService {
     private final UserRepository userRepository;
 
     @Override
+    public List<Game> getGames() {
+        return gameRepository.findAll();
+    }
+
+    @Override
     public Game getGame(Long id) {
         return gameRepository.getById(id);
     }
@@ -95,6 +100,14 @@ public class GameService implements IGameService {
         if (game.get(game.size() - 1).getPlayers().get(0) == user) return game.get(game.size() - 1);
         game.get(game.size() - 1).addPlayer(user);
         return gameRepository.save(game.get(game.size() - 1));
+    }
+
+    @Override
+    public Game joinGame(Long id, String username) {
+        Game game = gameRepository.getById(id);
+        User user = userRepository.findByUsername(username);
+        game.addPlayer(user);
+        return gameRepository.save(game);
     }
 
     @Override
